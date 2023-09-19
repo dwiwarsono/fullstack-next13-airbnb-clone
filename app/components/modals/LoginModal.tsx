@@ -33,15 +33,13 @@ const LoginModal = () => {
     },
   });
 
-  const onSubmit: SubmitHandler<FieldValues> = 
-  (data) => {
+  const onSubmit: SubmitHandler<FieldValues> = (data) => {
     setIsLoading(true);
 
-    signIn('credentials', { 
-      ...data, 
+    signIn('credentials', {
+      ...data,
       redirect: false,
-    })
-    .then((callback) => {
+    }).then((callback) => {
       setIsLoading(false);
 
       if (callback?.ok) {
@@ -49,18 +47,22 @@ const LoginModal = () => {
         router.refresh();
         loginModal.onClose();
       }
-      
+
       if (callback?.error) {
         toast.error(callback.error);
       }
     });
-  }
+  };
 
+  const onToggle = useCallback(() => {
+    loginModal.onClose();
+    registerModal.onOpen();
+  }, [loginModal, registerModal]);
 
   const bodyContent = (
     <div className="flex flex-col gap-4">
       <Heading title="Welcome back" subtitle="Login to your account" />
-      <Input 
+      <Input
         id="email"
         label="Email address"
         disabled={isLoading}
@@ -68,9 +70,9 @@ const LoginModal = () => {
         errors={errors}
         required
       />
-      <Input 
+      <Input
         id="password"
-        type='password'
+        type="password"
         label="Password"
         disabled={isLoading}
         register={register}
@@ -81,41 +83,38 @@ const LoginModal = () => {
   );
 
   const footerContent = (
-    <div className='flex flex-col gap-4 mt-3'>
-        <hr />
-        <Button 
-            outline
-            label='Continue with Google'
-            icon={FcGoogle}
-            onClick={() => signIn('google')}
-        />
-        <Button 
-            outline
-            label='Continue with Github'
-            icon={AiFillGithub}
-            onClick={() => signIn('github')}
-        />
-        <div 
-        className="
-          text-neutral-500 
-          text-center 
-          mt-4 
-          font-light
-        "
-      >
-        <p>Already have an account?
-          <span 
-            // onClick={onToggle} 
+    <div className="flex flex-col gap-4 mt-3">
+      <hr />
+      <Button
+        outline
+        label="Continue with Google"
+        icon={FcGoogle}
+        onClick={() => signIn('google')}
+      />
+      <Button
+        outline
+        label="Continue with Github"
+        icon={AiFillGithub}
+        onClick={() => signIn('github')}
+      />
+      <div className=" text-neutral-500 text-center mt-4 font-light">
+        <p>
+          First time using Airbnb?
+          <span
+            onClick={onToggle}
             className="
               text-neutral-800
               cursor-pointer 
               hover:underline
             "
-            > Log in</span>
+          >
+            {' '}
+            Create an account
+          </span>
         </p>
       </div>
     </div>
-  ) 
+  );
 
   return (
     <Modal
