@@ -1,9 +1,12 @@
 'use client';
 
 import useRentModal from '@/app/hooks/useRentModal';
+import axios from 'axios';
 import dynamic from 'next/dynamic';
+import { useRouter } from 'next/navigation';
 import { useMemo, useState } from 'react';
-import { FieldValues, useForm } from 'react-hook-form';
+import { FieldValues, SubmitHandler, useForm } from 'react-hook-form';
+import toast from 'react-hot-toast';
 import Heading from '../Heading';
 import CategoryInput from '../Inputs/CategoryInput';
 import Counter from '../Inputs/Counter';
@@ -24,6 +27,7 @@ enum STEPS {
 }
 
 const RentModal = () => {
+  const router = useRouter();
   const rentModal = useRentModal();
 
   const [isLoading, setIsLoading] = useState(false);
@@ -80,6 +84,29 @@ const RentModal = () => {
   const onNext = () => {
     setStep((value) => value + 1);
   };
+
+  const onSubmit: SubmitHandler<FieldValues> = (data) => {
+    if (step !== STEPS.PRICE) {
+      return onNext();
+    }
+
+    setIsLoading(true);
+
+    axios.post('/api/listings', data)
+    .then(() => {
+      toast.success('Listing created successfully!');
+      router.refresh();
+      reset(); // FUngsi ini bawaan react-hook-form' untuk mereset semua value yang ada di form
+      setStep(STEPS.CATEGORY);
+      rentModal.onClose();
+    })
+    .catch(() => {
+      toast.error('Something went wrong, please try again later');
+    })
+    .finally(() => {
+      setIsLoading(false);
+    })
+  }
 
   const actionLabel = useMemo(() => {
     if (step === STEPS.PRICE) {
@@ -246,7 +273,7 @@ const RentModal = () => {
       disabled={isLoading}
       isOpen={rentModal.isOpen}
       onClose={rentModal.onClose}
-      onSubmit={onNext}
+      onSubmit={handleSubmit(onSubmit)}
       actionLabel={actionLabel}
       secondaryActionLabel={secondaryActionLabel}
       secondaryAction={step === STEPS.CATEGORY ? undefined : onBack}
