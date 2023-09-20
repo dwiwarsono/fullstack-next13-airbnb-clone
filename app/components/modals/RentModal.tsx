@@ -9,6 +9,7 @@ import CategoryInput from '../Inputs/CategoryInput';
 import Counter from '../Inputs/Counter';
 import CountrySelect from '../Inputs/CountrySelect';
 import ImageUpload from '../Inputs/ImageUpload';
+import Input from '../Inputs/input';
 
 import { categories } from '../navbar/Categories';
 import Modal from './Modal';
@@ -25,6 +26,7 @@ enum STEPS {
 const RentModal = () => {
   const rentModal = useRentModal();
 
+  const [isLoading, setIsLoading] = useState(false);
   const [step, setStep] = useState(STEPS.CATEGORY);
 
   const {
@@ -146,53 +148,102 @@ const RentModal = () => {
 
   if (step === STEPS.INFO) {
     bodyContent = (
-      <div className='flex flex-col gap-8'>
-        <Heading 
-          title='Share some basic about your place'
-          subtitle='What amnestites do you have?'
+      <div className="flex flex-col gap-8">
+        <Heading
+          title="Share some basic about your place"
+          subtitle="What amnestites do you have?"
         />
-        <Counter 
-          title='Guests'
-          subtitle='How many guest do you allow?'
+        <Counter
+          title="Guests"
+          subtitle="How many guest do you allow?"
           value={guestCount}
           onChange={(value) => setCustomValue('guestCount', value)}
         />
         <hr />
-        <Counter 
-          title='Rooms'
-          subtitle='How many rooms do you have?'
+        <Counter
+          title="Rooms"
+          subtitle="How many rooms do you have?"
           value={roomCount}
           onChange={(value) => setCustomValue('roomCount', value)}
         />
         <hr />
-        <Counter 
-          title='Bathrooms'
-          subtitle='How many bathrooms do you have'
+        <Counter
+          title="Bathrooms"
+          subtitle="How many bathrooms do you have"
           value={bathroomCount}
           onChange={(value) => setCustomValue('bathroomCount', value)}
         />
       </div>
-    )
+    );
   }
 
   if (step === STEPS.IMAGES) {
     bodyContent = (
-      <div className='flex flex-col gap-8'>
-        <Heading 
+      <div className="flex flex-col gap-8">
+        <Heading
           title="Add a photo of your place"
-          subtitle='Show guests waht your place looks like!'
+          subtitle="Show guests waht your place looks like!"
         />
-        <ImageUpload 
+        <ImageUpload
           value={imageSrc}
           onChange={(value) => setCustomValue('imageSrc', value)}
-        
         />
       </div>
-    )
+    );
+  }
+
+  if (step === STEPS.DESCRIPTION) {
+    bodyContent = (
+      <div className="flex flex-col gap-8">
+        <Heading
+          title="How would you describe your place?"
+          subtitle="Short and sweet works best!"
+        />
+        <Input
+          id="title"
+          label="Title"
+          disabled={isLoading}
+          register={register}
+          errors={errors}
+          required
+        />
+        <hr />
+        <Input
+          id="description"
+          label="Description"
+          disabled={isLoading}
+          register={register}
+          errors={errors}
+          required
+        />
+      </div>
+    );
+  }
+
+  if (step === STEPS.PRICE) {
+    bodyContent = (
+      <div className="flex flex-col gap-8">
+        <Heading
+          title="Now, set your price"
+          subtitle="How much do you charge per night?"
+        />
+        <Input
+          id="price"
+          label="Price"
+          formatPrice
+          type="number"
+          disabled={isLoading}
+          register={register}
+          errors={errors}
+          required
+        />
+      </div>
+    );
   }
 
   return (
     <Modal
+      disabled={isLoading}
       isOpen={rentModal.isOpen}
       onClose={rentModal.onClose}
       onSubmit={onNext}
